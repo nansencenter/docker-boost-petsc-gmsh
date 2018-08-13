@@ -1,9 +1,22 @@
-FROM ubuntu:14.04
+FROM debian:stable-slim
 
 RUN apt-get update && apt-get install -y \
-    software-properties-common
+    build-essential \
+    gfortran-4.8 \
+    software-properties-common \
+    python \
+    wget
 
-RUN add-apt-repository ppa:mhier/libboost-latest && apt-get update && apt-get install -y \
-    libboost1.67-dev
+COPY install_boost.sh /scripts/
+WORKDIR /scripts
+RUN ./install_boost.sh
+
+
+#RUN add-apt-repository ppa:jonathonf/gcc && sudo apt-get update && apt-get install -y \
+#    gcc-5
+
+#COPY install_petsc.sh /scripts/
+#WORKDIR /scripts
+#RUN ./install_petsc.sh
 
 CMD [ "/bin/bash" ]
