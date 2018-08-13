@@ -1,4 +1,6 @@
-wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz
+#!/bin/sh
+
+wget -nv -nc http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz
 tar -xzf petsc-3.9.3.tar.gz
 cd petsc-3.9.3
 
@@ -30,5 +32,5 @@ mkdir -p $PETSC_PREFIX
 	--download-metis=yes \
 	--prefix=$PETSC_PREFIX
 
-#make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
-#make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install
+make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
+make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install
