@@ -1,12 +1,5 @@
-#!/bin/sh
-#cd /usr/bin
-#ln -sf gcc-5 gcc
-#ln -sf gcc-ar-5 gcc-ar
-#ln -sf gfortran-4.8 gfortran
-
-#cd /scripts
 wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz
-tar -xzvf petsc-3.9.3.tar.gz
+tar -xzf petsc-3.9.3.tar.gz
 cd petsc-3.9.3
 
 export PETSC_PREFIX=/opt/local/petsc
@@ -36,3 +29,6 @@ mkdir -p $PETSC_PREFIX
 	--with-metis=1 \
 	--download-metis=yes \
 	--prefix=$PETSC_PREFIX
+
+#make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
+#make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install
