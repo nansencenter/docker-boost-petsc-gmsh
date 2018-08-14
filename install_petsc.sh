@@ -32,5 +32,5 @@ mkdir -p $PETSC_PREFIX
 	--download-metis=yes \
 	--prefix=$PETSC_PREFIX
 
-make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
-make PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install
+make -j8 PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
+make -j8 PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install

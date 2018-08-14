@@ -1,7 +1,7 @@
 #!/bin/sh
 export BOOST_PREFIX=/opt/boost
 
-wget https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
+wget -nc -nv https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
 tar -xzf boost_1_68_0.tar.gz
 cd boost_1_68_0
 
@@ -12,8 +12,7 @@ mkdir $BOOST_PREFIX
 	--without-libraries=python \
 	cxxflags="-arch x86_64" \
 	address-model=32_64 \
-	threading=single,multi \
-	macos-version=10.10
+	threading=single,multi
 
 echo "using mpi ;" >> project-config.jam
 
