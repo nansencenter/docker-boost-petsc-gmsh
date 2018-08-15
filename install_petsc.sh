@@ -4,8 +4,8 @@ mkdir -p $PREFIX
 
 cd $NEXTSIM_ROOT_DIR
 
-wget -nv -nc -O pets.tar.gz $PETSC_URL
-tar -xzf petsc.tar.gz
+wget -nv -nc -O pets.tgz $PETSC_URL
+mkdir petsc && tar -xzf petsc.tgz -C petsc --strip-components=1
 cd petsc
 
 ./configure \

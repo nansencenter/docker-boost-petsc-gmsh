@@ -1,0 +1,4 @@
+export NETCDF_DIR=/usr/lib/x86_64-linux-gnu
+export OPENMPI_LIB_DIR=/usr/lib/x86_64-linux-gnu/openmpi/lib
+export OPENMPI_INCLUDE_DIR=/usr/lib/x86_64-linux-gnu/openmpi/include
+export LD_LIBRARY_PATH=$BOOST_LIBDIR:$GMSH_DIR/lib

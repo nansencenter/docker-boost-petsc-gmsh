@@ -23,14 +23,12 @@ RUN apt-get update && apt-get install -y \
     wget \
 && rm -rf /var/lib/apt/lists/*
 
-COPY *.sh $NEXTSIM_ROOT_DIR/
+COPY * $NEXTSIM_ROOT_DIR/
 
+WORKDIR $NEXTSIM_ROOT_DIR
 RUN ./install_boost.sh
-
 RUN ./install_petsc.sh
-
 RUN ./install_gmsh.sh
-
-RUN ./update_bash.sh
+RUN cat nextsim.src.template >> $NEXTSIM_SRC_FILE
 
 CMD [ "/bin/bash" ]

@@ -3,8 +3,8 @@ PREFIX=/opt/local/gmsh
 mkdir -p $PREFIX
 
 cd $NEXTSIM_ROOT_DIR
-wget -nv -nc -O gmsh.tar.gz $GMSH_URL
-tar -xzf gmsh.tar.gz
+wget -nv -nc -O gmsh.tgz $GMSH_URL
+mkdir gmsh && tar -xzf gmsh.tgz -C gmsh --strip-components=1
 cd gmsh
 
 mkdir build
