@@ -1,5 +1,11 @@
 FROM ubuntu:latest
 
+ENV GMSH_URL https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_2_16_0/gmsh-gmsh_2_16_0.tar.gz
+ENV PETSC_URL http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz
+ENV BOOST_URL https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
+ENV NEXTSIM_ROOT_DIR /nextsim
+ENV NEXTSIM_SRC_FILE $NEXTSIM_ROOT_DIR/nextsim.src
+
 RUN apt-get update && apt-get install -y \
     cmake \
     libhdf5-dev \
@@ -10,29 +16,21 @@ RUN apt-get update && apt-get install -y \
     libnetcdf-c++4-dev \
     libopenmpi-dev \
     software-properties-common \
+    ssh \
     python \
     valgrind \
-    wget
+    vim \
+    wget \
+&& rm -rf /var/lib/apt/lists/*
 
-RUN add-apt-repository ppa:jonathonf/gcc && apt-get update && apt-get install -y \
-    g++ \
-    gcc \
-    gfortran
+COPY *.sh $NEXTSIM_ROOT_DIR/
 
-COPY install_boost_simple.sh /scripts/
-WORKDIR /scripts
-RUN ./install_boost_simple.sh
+RUN ./install_boost.sh
 
-COPY install_petsc.sh /scripts/
-WORKDIR /scripts
 RUN ./install_petsc.sh
 
-COPY install_gmsh.sh /scripts/
-WORKDIR /scripts
 RUN ./install_gmsh.sh
 
-COPY update_bash.sh /scripts/
-WORKDIR /scripts
 RUN ./update_bash.sh
 
 CMD [ "/bin/bash" ]

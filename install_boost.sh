@@ -1,29 +1,18 @@
 #!/bin/sh
-export BOOST_PREFIX=/opt/boost
+PREFIX=/opt/local/boost
+mkdir -p $PREFIX
 
-wget -nc -nv https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
-tar -xzf boost_1_68_0.tar.gz
-cd boost_1_68_0
-
-mkdir $BOOST_PREFIX
-
-./bootstrap.sh \
-	--prefix=$BOOST_PREFIX \
-	--without-libraries=python \
-	cxxflags="-arch x86_64" \
-	address-model=32_64 \
-	threading=single,multi
-
+cd $NEXTSIM_ROOT_DIR
+wget -nc -nv -O boost.tar.gz $BOOST_URL
+tar -xzf boost.tar.gz
+cd boost
+./bootstrap.sh --prefix=$PREFIX --with-libraries=program_options,filesystem,system,mpi,serialization,date_time
 echo "using mpi ;" >> project-config.jam
+./b2 -j8
+./b2 install
 
-./b2 -j8 \
-	 --layout=tagged \
-	 --debug-configuration \
-	 --prefix=$BOOST_PREFIX \
-	 toolset=darwin \
-	 variant=release \
-	 threading=single,multi \
-	 link=shared,static \
-	 cxxflags="-std=c++11"
+echo "export BOOST_INCDIR=$PREFIX/include" >> $NEXTSIM_SRC_FILE
+echo "export BOOST_LIBDIR=$PREFIX/lib" >> $NEXTSIM_SRC_FILE
 
-./b2 install --prefix=$BOOST_PREFIX
+cd $NEXTSIM_ROOT_DIR
+rm boost

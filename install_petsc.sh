@@ -1,11 +1,12 @@
 #!/bin/sh
+PREFIX=/usr/local/petsc
+mkdir -p $PREFIX
 
-wget -nv -nc http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz
-tar -xzf petsc-3.9.3.tar.gz
-cd petsc-3.9.3
+cd $NEXTSIM_ROOT_DIR
 
-export PETSC_PREFIX=/opt/local/petsc
-mkdir -p $PETSC_PREFIX
+wget -nv -nc -O pets.tar.gz $PETSC_URL
+tar -xzf petsc.tar.gz
+cd petsc
 
 ./configure \
 	-with-python \
@@ -30,7 +31,14 @@ mkdir -p $PETSC_PREFIX
 	--with-c2html=0 \
 	--with-metis=1 \
 	--download-metis=yes \
-	--prefix=$PETSC_PREFIX
+	--prefix=$PREFIX
 
-make -j8 PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt all
-make -j8 PETSC_DIR=/scripts/petsc-3.9.3 PETSC_ARCH=arch-linux2-c-opt install
+make -j8 PETSC_DIR=$NEXTSIM_ROOT_DIR/petsc PETSC_ARCH=arch-linux2-c-opt all
+make -j8 PETSC_DIR=$NEXTSIM_ROOT_DIR/petsc PETSC_ARCH=arch-linux2-c-opt install
+
+echo "export PETSC_DIR=$PREFIX" >> $NEXTSIM_SRC_FILE
+echo "export PETSC_ARCH=arch-linux2-c-opt" >> $NEXTSIM_SRC_FILE
+
+cd $NEXTSIM_ROOT_DIR
+rm -rf petsc
+

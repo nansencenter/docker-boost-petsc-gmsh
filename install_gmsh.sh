@@ -1,8 +1,11 @@
 #!/bin/sh
+PREFIX=/opt/local/gmsh
+mkdir -p $PREFIX
 
-wget -nv -nc https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_3_0_6/gmsh-gmsh_3_0_6.tar.gz
-tar -xzf gmsh-gmsh_3_0_6.tar.gz
-cd gmsh-gmsh_3_0_6
+cd $NEXTSIM_ROOT_DIR
+wget -nv -nc -O gmsh.tar.gz $GMSH_URL
+tar -xzf gmsh.tar.gz
+cd gmsh
 
 mkdir build
 cd build
@@ -10,7 +13,7 @@ cd build
 cmake .. \
         -DCMAKE_CXX_COMPILER=`which g++` \
         -DCMAKE_C_COMPILER=`which gcc` \
-        -DCMAKE_INSTALL_PREFIX=/opt/local/gmsh/3.06 \
+        -DCMAKE_INSTALL_PREFIX=$PREFIX \
         -DCMAKE_BUILD_TYPE=release \
         -DENABLE_BUILD_LIB=ON \
         -DENABLE_BUILD_SHARED=ON \
@@ -21,3 +24,8 @@ cmake .. \
         -DENABLE_OPENMP=ON
 
 make -j8 install
+
+echo "export GMSH_DIR=$PREFIX" >> $NEXTSIM_SRC_FILE
+
+cd $NEXTSIM_ROOT_DIR
+rm -rf gmsh
