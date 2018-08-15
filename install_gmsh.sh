@@ -2,7 +2,7 @@
 PREFIX=/opt/local/gmsh
 mkdir -p $PREFIX
 
-cd $NEXTSIM_ROOT_DIR
+cd $NEXTSIMDIR
 wget -nv -nc -O gmsh.tgz $GMSH_URL
 mkdir gmsh && tar -xzf gmsh.tgz -C gmsh --strip-components=1
 cd gmsh
@@ -27,5 +27,5 @@ make -j8 install
 
 echo "export GMSH_DIR=$PREFIX" >> $NEXTSIM_SRC_FILE
 
-cd $NEXTSIM_ROOT_DIR
-rm -rf gmsh
+cd $NEXTSIMDIR
+rm -rf gmsh gmsh.tgz
