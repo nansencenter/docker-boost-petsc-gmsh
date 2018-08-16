@@ -27,32 +27,32 @@ RUN apt-get update && apt-get install -y python valgrind
 RUN wget -nc -nv http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz \
 &&  tar -xzf petsc-3.9.3.tar.gz
 WORKDIR petsc-3.9.3
-RUN ./configure \
-	-with-python \
-	--with-cxx=mpicxx \
-	--with-cc=mpicc \
-	--with-fc=mpif90 \
-	--with-mpiexec=mpiexec \
-	--with-debugging=yes \
-	--with-c-support=1 \
-	--with-c++-support=1 \
-	--with-shared-libraries=1 \
-	--with-blacs \
-	--download-blacs=yes \
-	--with-parmetis=1 \
-	--download-parmetis=yes \
-	--with-scalapack=1 \
-	--download-scalapack=yes \
-	--with-mumps=1 \
-	--download-mumps=yes \
-	--with-suitesparse=1 \
-	--download-suitesparse=yes \
-	--with-c2html=0 \
-	--with-metis=1 \
-	--download-metis=yes \
-	--prefix=/opt/local/petsc
-RUN make -j8 PETSC_DIR=./ PETSC_ARCH=arch-linux2-c-opt all \
-&&  make -j8 PETSC_DIR=./ PETSC_ARCH=arch-linux2-c-opt install
+ENV OPTIONS --with-python \
+    --with-cxx=mpicxx \
+    --with-cc=mpicc \
+    --with-fc=mpif90 \
+    --with-mpiexec=mpiexec \
+    --with-c-support=1 \
+    --with-c++-support=1 \
+    --with-shared-libraries=1 \
+    --with-blacs \
+    --download-blacs=yes \
+    --with-parmetis=1 \
+    --download-parmetis=yes \
+    --with-scalapack=1 \
+    --download-scalapack=yes \
+    --with-mumps=1 \
+    --download-mumps=yes \
+    --with-suitesparse=1 \
+    --download-suitesparse=yes \
+    --with-c2html=0 \
+    --with-metis=1 \
+    --download-metis=yes
+RUN ./configure $OPTIONS --with-debugging=yes --prefix=/opt/local/petsc-debug
+RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug install
+RUN ./configure $OPTIONS --with-debugging=0 --prefix=/opt/local/petsc
+RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt install
+
 
 FROM boost_petsc_gmsh:base as gmsh
 RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_2_16_0/gmsh-gmsh_2_16_0.tar.gz \
