@@ -33,7 +33,7 @@ RUN ./configure \
 	--with-cc=mpicc \
 	--with-fc=mpif90 \
 	--with-mpiexec=mpiexec \
-	--with-debugging=0 \
+	--with-debugging=yes \
 	--with-c-support=1 \
 	--with-c++-support=1 \
 	--with-shared-libraries=1 \
