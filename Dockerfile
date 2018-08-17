@@ -22,37 +22,51 @@ RUN ./bootstrap.sh \
 && ./b2 -j8 \
 && ./b2 install
 
+#optional libs for petsc: libblacs-openmpi1 libmumps-dev libparmetis-dev libscalapack-openmpi-dev libsuitesparse-dev libmetis-dev
 FROM boost_petsc_gmsh:base as petsc
-RUN apt-get update && apt-get install -y python valgrind
+RUN apt-get update && apt-get install -y \
+    bison \
+    flex \
+    libdata-dumper-simple-perl \
+    python \
+    valgrind
 RUN wget -nc -nv http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.3.tar.gz \
 &&  tar -xzf petsc-3.9.3.tar.gz
 WORKDIR petsc-3.9.3
-ENV OPTIONS --with-python \
-    --with-cxx=mpicxx \
-    --with-cc=mpicc \
-    --with-fc=mpif90 \
-    --with-mpiexec=mpiexec \
+ENV OPTIONS    -with-python \
     --with-c-support=1 \
     --with-c++-support=1 \
     --with-shared-libraries=1 \
+    --with-cxx=mpicxx \
+    --with-cc=mpicc \
+    --with-fc=mpif90 \
+    --CFLAGS='-O3' \
+    --CXXFLAGS='-O3' \
+    --FFLAGS='-O3' \
+    --with-mpiexec=mpiexec \
     --with-blacs \
     --download-blacs=yes \
-    --with-parmetis=1 \
-    --download-parmetis=yes \
     --with-scalapack=1 \
     --download-scalapack=yes \
+    --download-fblaslapack=yes \
     --with-mumps=1 \
     --download-mumps=yes \
+    --with-pastix=1 \
+    --download-pastix=yes \
+    --with-superlu=1 \
+    --download-superlu=yes \
+    --with-superlu_dist=1 \
+    --download-superlu_dist=yes \
+    --with-ml=1 \
+    --download-ml=yes \
     --with-suitesparse=1 \
     --download-suitesparse=yes \
-    --with-c2html=0 \
-    --with-metis=1 \
-    --download-metis=yes
-RUN ./configure $OPTIONS --with-debugging=yes --prefix=/opt/local/petsc-debug
-RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug install
-RUN ./configure $OPTIONS --with-debugging=0 --prefix=/opt/local/petsc
-RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt install
-
+    --with-ptscotch=1 \
+    --download-ptscotch=yes \
+    --with-c2html=0
+RUN ./configure $OPTIONS --with-debugging=1 --prefix=/opt/local/petsc-debug
+RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug all \
+&&  make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug install
 
 FROM boost_petsc_gmsh:base as gmsh
 RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_2_16_0/gmsh-gmsh_2_16_0.tar.gz \
@@ -63,17 +77,21 @@ RUN cmake \
     -DENABLE_BUILD_LIB=ON \
     -DENABLE_BUILD_SHARED=ON \
     -DENABLE_BUILD_DYNAMIC=ON \
-    -DCMAKE_BUILD_TYPE=release
+    -DCMAKE_BUILD_TYPE=release \
+	-DENABLE_MPI=OFF \
+	-DENABLE_MUMPS=OFF \
+	-DENABLE_PETSC=OFF \
+	-DENABLE_OPENMP=OFF
 RUN make -j8 \
 &&  make install
 
 FROM boost_petsc_gmsh:base
 COPY nextsim.src /nextsim/nextsim.src
 COPY --from=boost /opt/local/boost /opt/local/boost
-COPY --from=petsc /opt/local/petsc /opt/local/petsc
+COPY --from=petsc /opt/local/petsc-debug /opt/local/petsc-debug
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
-&&  echo '/opt/local/petsc/lib/' >> /etc/ld.so.conf \
+&&  echo '/opt/local/petsc-debug/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
 && ldconfig
 WORKDIR /nextsim
