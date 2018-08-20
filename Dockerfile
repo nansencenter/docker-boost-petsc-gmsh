@@ -85,14 +85,13 @@ RUN make -j8 \
 &&  make install
 
 FROM boost_petsc_gmsh:base
-COPY nextsim.src /nextsim/nextsim.src
 COPY --from=boost /opt/local/boost /opt/local/boost
 COPY --from=petsc /opt/local/petsc-debug /opt/local/petsc-debug
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/petsc-debug/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
-&& ldconfig
-WORKDIR /nextsim
+&&  ldconfig \
+&&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
 
 CMD [ "/bin/bash" ]
