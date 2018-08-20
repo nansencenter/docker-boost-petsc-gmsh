@@ -1,0 +1,8 @@
+#!/bin/bash
+export OPENMPI_INCLUDE_DIR=/usr/lib/x86_64-linux-gnu/openmpi/include
+export OPENMPI_LIB_DIR=/usr/lib/x86_64-linux-gnu/openmpi/lib
+export BOOST_INCDIR=/opt/local/boost/include
+export BOOST_LIBDIR=/opt/local/boost/lib
+export PETSC_DIR=/opt/local/petsc-debug
+export GMSH_DIR=/opt/local/gmsh
+

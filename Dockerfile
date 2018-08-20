@@ -93,5 +93,6 @@ RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
 &&  ldconfig \
 &&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
+COPY .nextsimrc /root/.nextsimrc
 
 CMD [ "/bin/bash" ]
