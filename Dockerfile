@@ -22,7 +22,6 @@ RUN ./bootstrap.sh \
 && ./b2 -j8 \
 && ./b2 install
 
-#optional libs for petsc: libblacs-openmpi1 libmumps-dev libparmetis-dev libscalapack-openmpi-dev libsuitesparse-dev libmetis-dev
 FROM boost_petsc_gmsh:base as petsc
 RUN apt-get update && apt-get install -y \
     bison \
@@ -69,9 +68,9 @@ RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug all \
 &&  make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug install
 
 FROM boost_petsc_gmsh:base as gmsh
-RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_2_16_0/gmsh-gmsh_2_16_0.tar.gz \
-&&  tar -xzf gmsh-gmsh_2_16_0.tar.gz
-WORKDIR gmsh-gmsh_2_16_0
+RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_3_0_6/gmsh-gmsh_3_0_6.tar.gz \
+&&  tar -xzf gmsh-gmsh_3_0_6.tar.gz
+WORKDIR gmsh-gmsh_3_0_6
 RUN cmake \
     -DCMAKE_INSTALL_PREFIX=/opt/local/gmsh \
     -DENABLE_BUILD_LIB=ON \
