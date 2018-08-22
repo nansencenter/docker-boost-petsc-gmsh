@@ -63,9 +63,9 @@ ENV OPTIONS    -with-python \
     --with-ptscotch=1 \
     --download-ptscotch=yes \
     --with-c2html=0
-RUN ./configure $OPTIONS --with-debugging=1 --prefix=/opt/local/petsc-debug
-RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug all \
-&&  make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-debug install
+RUN ./configure $OPTIONS --with-debugging=0 --prefix=/opt/local/petsc
+RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt all \
+&&  make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt install
 
 FROM boost_petsc_gmsh:base as gmsh
 RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_3_0_6/gmsh-gmsh_3_0_6.tar.gz \
@@ -86,10 +86,10 @@ RUN make -j8 \
 
 FROM boost_petsc_gmsh:base
 COPY --from=boost /opt/local/boost /opt/local/boost
-COPY --from=petsc /opt/local/petsc-debug /opt/local/petsc-debug
+COPY --from=petsc /opt/local/petsc /opt/local/petsc
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
-&&  echo '/opt/local/petsc-debug/lib/' >> /etc/ld.so.conf \
+&&  echo '/opt/local/petsc/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
 &&  ldconfig \
 &&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
