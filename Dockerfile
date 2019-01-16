@@ -7,9 +7,20 @@ RUN apt-get update && apt-get install -y \
     libblas-dev \
     liblapack-dev \
     libopenmpi-dev \
+    libnetcdff-dev \
+    bc \
     make \
     wget \
-&& rm -rf /var/lib/apt/lists/*
+&& rm -rf /var/lib/apt/lists/* \
+&& ln -s /usr/bin/make /usr/bin/gmake
+
+FROM boost_petsc_gmsh:base as oasis
+RUN mkdir oasis3-mct
+WORKDIR oasis3-mct
+RUN svn checkout https://oasis3mct.cerfacs.fr/svn/branches/OASIS3-MCT_4.0/oasis3-mct . \
+COPY oasis/make.inc utils/make_dir/make.inc
+WORKDIR oasis3-mct/utils/make_dir
+RUN make –f TopMakefileOasis3
 
 FROM boost_petsc_gmsh:base as boost
 RUN wget -nc -nv https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz \
@@ -84,13 +95,16 @@ RUN cmake \
 RUN make -j8 \
 &&  make install
 
+
 FROM boost_petsc_gmsh:base
 COPY --from=boost /opt/local/boost /opt/local/boost
 COPY --from=petsc /opt/local/petsc /opt/local/petsc
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
+COPY --from=oasis /opt/local/oasis /opt/local/oasis
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/petsc/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
+&&  echo '/opt/local/oasis/lib/' >> /etc/ld.so.conf \
 &&  ldconfig \
 &&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
 COPY .nextsimrc /root/.nextsimrc
