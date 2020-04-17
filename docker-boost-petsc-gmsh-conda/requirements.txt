@@ -23,4 +23,9 @@ pygrib
 pyproj
 pyshp
 rtree
-
+jupyter
+paramiko
+pandas
+xarray
+bottleneck
+dask
