@@ -1,15 +1,15 @@
-FROM nansencenter/boost_petsc_gmsh:0.0.6
+FROM nansencenter/boost_petsc_gmsh:0.0.6 as base
 LABEL maintainer="Anton Korosov <anton.korosov@nersc.no>"
 
 # Configure environment
-ENV SIM_USR=sim \
-    CONDA_DIR=/opt/conda \
+ENV CONDA_DIR=/opt/conda \
     SHELL=/bin/bash \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 ENV PATH=$CONDA_DIR/bin:$PATH \
-    HOME=/home/$SIM_USR
+    HOME=/root \
+    PROJ_LIB=/opt/conda/share/proj
 
 # Install all OS dependencies for notebook
 RUN apt-get update && apt-get -yq dist-upgrade \
@@ -29,46 +29,38 @@ RUN echo "LC_ALL=en_US.UTF-8" >> /etc/environment \
 &&  echo "LANG=en_US.UTF-8" > /etc/locale.conf \
 &&  locale-gen en_US.UTF-8
 
-# User sim with uid=1000
-RUN groupadd wheel -g 11 && \
-    groupadd $SIM_USR -g 1000 && \
-    echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
-    useradd -m -s /bin/bash -N -u 1000 -g 1000 $SIM_USR && \
-    mkdir -p $CONDA_DIR && \
-    chown $SIM_USR:$SIM_USR $CONDA_DIR && \
-    chmod g+w /etc/passwd
-
-USER sim
-
 # Install conda and Python packages
-COPY requirements.txt requirements.txt
 RUN wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh --no-check-certificate && \
     /bin/bash /tmp/miniconda.sh -fbp $CONDA_DIR && \
     rm /tmp/miniconda.sh && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set show_channel_urls true && \
     conda update --all --quiet --yes && \
-    conda install -q -y --file requirements.txt && \
-    conda clean -tipsy && \
-    rm -rf /home/$SIM_USR/.cache/yarn && \
-    rm -rf $CONDA_DIR/pkgs/*
+    conda init  && \
+    __conda_setup="$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)" && \
+    eval "$__conda_setup" && \
+    conda create -n pynextsim python=3.6 --yes
 
 # tweak configuration:
 #  - default matplotlib backend
 #  - add missing PROJ_LIB needed for Basemap
 #  - search history using pgup/pgdwn
 #  - save history in $HOME/env
-USER root
-WORKDIR $HOME
+WORKDIR /root
 RUN mkdir -p .config/matplotlib && \
     echo 'backend : tkagg' >> .config/matplotlib/matplotlibrc && \
     echo '"\e[5~": history-search-backward' >> .inputrc && \
     echo '"\e[6~": history-search-forward' >> .inputrc && \
     echo 'if [ -f "env/.nextsimrc" ]; then source env/.nextsimrc; fi' >> .bashrc && \
-    echo 'export PROJ_LIB=/opt/conda/share/proj' >> .bashrc && \
-    mkdir env && \
-    ln -s $HOME/env/.bash_history && \
-    mkdir -p .ipython/profile_default && \
-    ln -s $HOME/env/history.sqlite .ipython/profile_default/history.sqlite && \
-    chown sim:sim -R $HOME
+    echo 'conda activate pynextsim' >> .bashrc
 
+FROM test:base as final
+COPY requirements.txt requirements.txt
+RUN __conda_setup="$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)" && \
+    eval "$__conda_setup" && \
+    conda activate pynextsim && \
+    conda install -q -y --file requirements.txt && \
+    rm requirements.txt && \
+    conda clean -tipsy && \
+    rm -rf $HOME/.cache/yarn && \
+    rm -rf $CONDA_DIR/pkgs/*
