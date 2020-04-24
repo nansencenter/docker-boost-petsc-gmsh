@@ -21,6 +21,8 @@ RUN apt-get update && apt-get -yq dist-upgrade \
     libnetcdf-c++4-dev \
     locales \
     ssh \
+    lftp \
+    ncftp \
 &&  apt-get clean \
 &&  rm -rf /var/lib/apt/lists/*
 
