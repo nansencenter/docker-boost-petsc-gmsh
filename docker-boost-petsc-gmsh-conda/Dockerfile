@@ -56,7 +56,7 @@ RUN mkdir -p .config/matplotlib && \
     echo 'if [ -f "env/.nextsimrc" ]; then source env/.nextsimrc; fi' >> .bashrc && \
     echo 'conda activate pynextsim' >> .bashrc
 
-FROM test:base as final
+FROM boost_petsc_gmsh_conda:base as conda
 COPY requirements.txt requirements.txt
 RUN __conda_setup="$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)" && \
     eval "$__conda_setup" && \
