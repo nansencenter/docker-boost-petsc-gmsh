@@ -26,3 +26,4 @@ dependencies:
   - scikit-learn
   - scipy
   - shapely
+  - pandas

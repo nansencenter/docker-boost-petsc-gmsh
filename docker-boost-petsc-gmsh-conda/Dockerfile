@@ -52,7 +52,7 @@ WORKDIR /root
 RUN mkdir -p .config/matplotlib \
 &&  echo 'backend : tkagg' >> .config/matplotlib/matplotlibrc \
 &&  echo '"\e[5~": history-search-backward' >> .inputrc \
-&&  echo '"\e[6~": history-search-forward' >> .inputrc \
+&&  echo '"\e[6~": history-search-forward' >> .inputrc
 
 ENV CONDA_DEFAULT_ENV pynextsim
 ENV PATH $CONDA_DIR/envs/pynextsim/bin:$PATH
