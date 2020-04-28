@@ -14,7 +14,6 @@ docker login --username=akorosov
 docker push nansencenter/boost_petsc_gmsh:0.0.6
 # build, tag and push the conda image
 cd docker-boost-petsc-gmsh-conda
-docker build . -t boost_petsc_gmsh_conda:base --target base
 docker build . -t boost_petsc_gmsh_conda:0.0.2
 docker tag  027ad8379c83 nansencenter/boost_petsc_gmsh_conda:0.0.2
 docker push nansencenter/boost_petsc_gmsh_conda:0.0.2
