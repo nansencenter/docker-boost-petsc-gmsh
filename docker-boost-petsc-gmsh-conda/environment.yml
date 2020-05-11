@@ -29,3 +29,4 @@ dependencies:
   - scipy
   - shapely
   - pandas
+  - pyyaml
