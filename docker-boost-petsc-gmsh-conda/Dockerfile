@@ -18,11 +18,11 @@ RUN apt-get update && apt-get -yq dist-upgrade \
     fonts-liberation \
     grsync \
     imagemagick \
-    libx11-dev \
-    libnetcdf-dev \
-    libnetcdf-c++4-dev \
-    locales \
     lftp \
+    libnetcdf-c++4-dev \
+    libnetcdf-dev \
+    libx11-dev \
+    locales \
     nco \
     rsync \
     ssh \
