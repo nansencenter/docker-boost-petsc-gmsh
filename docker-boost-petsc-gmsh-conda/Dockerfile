@@ -16,6 +16,7 @@ ENV PATH=$CONDA_DIR/bin:$PATH \
 RUN apt-get update && apt-get -yq dist-upgrade \
 &&  apt-get install -yq --no-install-recommends \
     fonts-liberation \
+    grsync \
     imagemagick \
     libx11-dev \
     libnetcdf-dev \
@@ -23,6 +24,7 @@ RUN apt-get update && apt-get -yq dist-upgrade \
     locales \
     lftp \
     nco \
+    rsync \
     ssh \
 &&  apt-get clean \
 &&  rm -rf /var/lib/apt/lists/*
