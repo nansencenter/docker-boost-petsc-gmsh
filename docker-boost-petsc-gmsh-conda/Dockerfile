@@ -15,15 +15,17 @@ ENV PATH=$CONDA_DIR/bin:$PATH \
 # Install all OS dependencies for notebook
 RUN apt-get update && apt-get -yq dist-upgrade \
 &&  apt-get install -yq --no-install-recommends \
-    imagemagick \
     fonts-liberation \
-    libx11-dev \
-    libnetcdf-dev \
-    libnetcdf-c++4-dev \
-    locales \
-    ssh \
+    grsync \
+    imagemagick \
     lftp \
-    ncftp \
+    libnetcdf-c++4-dev \
+    libnetcdf-dev \
+    libx11-dev \
+    locales \
+    nco \
+    rsync \
+    ssh \
 &&  apt-get clean \
 &&  rm -rf /var/lib/apt/lists/*
 

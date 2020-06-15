@@ -8,8 +8,8 @@ dependencies:
   - cmocean
   - cython
   - gdal
-  - ipython
   - ipdb
+  - ipython
   - jupyter
   - matplotlib
   - mock
@@ -18,15 +18,15 @@ dependencies:
   - nose
   - notebook
   - numpy
+  - pandas
   - paramiko
   - pillow
   - pygrib
   - pyproj
   - pyshp
+  - pyyaml
   - rtree
   - scikit-image
   - scikit-learn
   - scipy
   - shapely
-  - pandas
-  - pyyaml
