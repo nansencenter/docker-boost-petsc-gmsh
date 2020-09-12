@@ -8,8 +8,8 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     PYTHONUNBUFFERED=1 \
-    PATH=$CONDA_DIR/bin:$PATH \
     HOME=/root
+ENV PATH=$CONDA_DIR/bin:$PATH
 
 # Install all OS dependencies for notebook
 RUN apt-get update && apt-get -yq dist-upgrade \
