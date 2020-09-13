@@ -23,9 +23,9 @@ WORKDIR oasis3-mct/utils/make_dir
 RUN make –f TopMakefileOasis3
 
 FROM boost_petsc_gmsh:base as boost
-RUN wget -nc -nv https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz \
-&& tar -xzf boost_1_68_0.tar.gz
-WORKDIR boost_1_68_0
+RUN wget -nc -nv https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz \
+&& tar -xzf boost_1_72_0.tar.gz
+WORKDIR boost_1_72_0
 RUN ./bootstrap.sh \
     --prefix=/opt/local/boost \
     --with-libraries=program_options,filesystem,system,mpi,serialization,date_time \
@@ -88,10 +88,10 @@ RUN cmake \
     -DENABLE_BUILD_SHARED=ON \
     -DENABLE_BUILD_DYNAMIC=ON \
     -DCMAKE_BUILD_TYPE=release \
-	-DENABLE_MPI=OFF \
-	-DENABLE_MUMPS=OFF \
-	-DENABLE_PETSC=OFF \
-	-DENABLE_OPENMP=OFF
+    -DENABLE_MPI=OFF \
+    -DENABLE_MUMPS=OFF \
+    -DENABLE_PETSC=OFF \
+    -DENABLE_OPENMP=OFF
 RUN make -j8 \
 &&  make install
 
