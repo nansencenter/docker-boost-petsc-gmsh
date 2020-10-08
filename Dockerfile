@@ -1,4 +1,4 @@
-FROM ubuntu:bionic as base
+FROM ubuntu:bionic as builder
 RUN apt-get update && apt-get install -y \
     cmake \
     g++ \
@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     wget \
 && rm -rf /var/lib/apt/lists/*
 
-FROM boost_petsc_gmsh:base as boost
+
+# new boost: https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
+FROM builder as boost
 RUN wget -nc -nv https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz \
 && tar -xzf boost_1_72_0.tar.gz
 WORKDIR boost_1_72_0
@@ -22,7 +24,9 @@ RUN ./bootstrap.sh \
 && ./b2 -j8 \
 && ./b2 install
 
-FROM boost_petsc_gmsh:base as petsc
+
+# new pets https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz
+FROM builder as petsc
 RUN apt-get update && apt-get install -y \
     bison \
     flex \
@@ -67,7 +71,9 @@ RUN ./configure $OPTIONS --with-debugging=0 --prefix=/opt/local/petsc
 RUN make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt all \
 &&  make -j8 PETSC_DIR=. PETSC_ARCH=arch-linux2-c-opt install
 
-FROM boost_petsc_gmsh:base as gmsh
+# new gmsh https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_4_6_0/gmsh-gmsh_4_6_0.tar.gz
+
+FROM builder as gmsh
 RUN wget -nc -nv https://gitlab.onelab.info/gmsh/gmsh/-/archive/gmsh_3_0_6/gmsh-gmsh_3_0_6.tar.gz \
 &&  tar -xzf gmsh-gmsh_3_0_6.tar.gz
 WORKDIR gmsh-gmsh_3_0_6
@@ -84,10 +90,33 @@ RUN cmake \
 RUN make -j8 \
 &&  make install
 
-FROM boost_petsc_gmsh:base
+
+FROM continuumio/miniconda3 as conda
+COPY environment.yml /tmp/environment.yml
+RUN conda env create -f /tmp/environment.yml
+RUN conda install conda-pack && \
+    conda-pack -n environment -o /tmp/env.tar && \
+    mkdir /venv && tar -C /venv -xf /tmp/env.tar && \
+    /venv/bin/conda-unpack
+
+
+FROM ubuntu:bionic
+RUN apt-get update && apt-get install -y \
+    libblas-dev \
+    liblapack-dev \
+    libopenmpi-dev \
+    libnetcdf-dev \
+    libnetcdf-c++4-dev \
+    ssh \
+    valgrind \
+    bc \
+    git \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 COPY --from=boost /opt/local/boost /opt/local/boost
 COPY --from=petsc /opt/local/petsc /opt/local/petsc
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
+COPY --from=conda /venv /venv
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/petsc/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
@@ -95,4 +124,7 @@ RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
 COPY .nextsimrc /root/.nextsimrc
 
+ENV PATH="/venv/bin:$PATH"
+
 CMD [ "/bin/bash" ]
+
