@@ -1,4 +1,4 @@
-name: pynextsim
+name: environment
 channels:
   - conda-forge
 dependencies:
@@ -6,25 +6,16 @@ dependencies:
   - cmocean
   - cython
   - gdal
-  - ipdb
-  - ipython
-  - jupyter
   - matplotlib
-  - mock
   - netcdf4
   - netcdftime
-  - nose
-  - notebook
   - numpy
   - pandas
-  - paramiko
   - pillow
   - pygrib
   - pyproj
   - pyshp
   - pyyaml
   - rtree
-  - scikit-image
-  - scikit-learn
   - scipy
   - shapely

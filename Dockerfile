@@ -90,41 +90,82 @@ RUN cmake \
 RUN make -j8 \
 &&  make install
 
-
+# prepare conda package for production image
 FROM continuumio/miniconda3 as conda
-COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml
+COPY environment_pro.yml /tmp/environment_pro.yml
+RUN conda env create -f /tmp/environment_pro.yml
 RUN conda install conda-pack && \
     conda-pack -n environment -o /tmp/env.tar && \
     mkdir /venv && tar -C /venv -xf /tmp/env.tar && \
     /venv/bin/conda-unpack
 
-
-FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y \
+# base image for both production and development
+# TODO: maybe move ssh, valgrind, bc, git to development
+FROM ubuntu:bionic as base
+RUN apt-get update  --fix-missing && apt-get install -y \
     libblas-dev \
     liblapack-dev \
     libopenmpi-dev \
     libnetcdf-dev \
     libnetcdf-c++4-dev \
-    ssh \
-    valgrind \
-    bc \
-    git \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 COPY --from=boost /opt/local/boost /opt/local/boost
 COPY --from=petsc /opt/local/petsc /opt/local/petsc
 COPY --from=gmsh /opt/local/gmsh /opt/local/gmsh
-COPY --from=conda /venv /venv
 RUN echo '/opt/local/boost/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/petsc/lib/' >> /etc/ld.so.conf \
 &&  echo '/opt/local/gmsh/lib/' >> /etc/ld.so.conf \
 &&  ldconfig \
 &&  ln -s /opt/local/gmsh/bin/gmsh /usr/local/bin/gmsh
-COPY .nextsimrc /root/.nextsimrc
-
-ENV PATH="/venv/bin:$PATH"
-
+ENV OPENMPI_INCLUDE_DIR=/usr/lib/x86_64-linux-gnu/openmpi/include
+ENV OPENMPI_LIB_DIR=/usr/lib/x86_64-linux-gnu/openmpi/lib
+ENV BOOST_INCDIR=/opt/local/boost/include
+ENV BOOST_LIBDIR=/opt/local/boost/lib
+ENV PETSC_DIR=/opt/local/petsc
+ENV GMSH_DIR=/opt/local/gmsh
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 CMD [ "/bin/bash" ]
 
+# production image
+FROM base as production
+COPY --from=conda /venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+# development image
+FROM base as development
+ENV PATH /opt/conda/bin:$PATH
+RUN apt-get update --fix-missing && apt-get install -y \
+    cmake \
+    g++ \
+    gcc \
+    make \
+    fonts-liberation \
+    grsync \
+    imagemagick \
+    lftp \
+    libnetcdf-c++4-dev \
+    libnetcdf-dev \
+    libx11-dev \
+    locales \
+    nco \
+    rsync \
+    ssh \
+    valgrind \
+    bc \
+    git \
+    wget \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
+COPY environment_dev.txt /tmp/env.txt
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc && \
+    conda update -yq conda && \
+    conda install -c conda-forge --file /tmp/env.txt && \
+    /opt/conda/bin/conda clean -a && \
+    rm -rf $HOME/.cache/yarn && \
+    rm -rf /opt/conda/pkgs/*
