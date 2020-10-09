@@ -13,7 +13,6 @@ dependencies:
   - pandas
   - pillow
   - pyproj
-  - pyshp
   - pyyaml
   - scipy
   - shapely
